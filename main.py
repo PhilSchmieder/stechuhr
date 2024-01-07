@@ -101,8 +101,20 @@ def new_db(db_file):
     run_query(db_file, CREATE_TABLE_TIME)
 
 
-def export(database, export_format):
-    pass
+def _export_csv(db_file, export_out):
+    with open(export_out, "w") as f:
+        f.write("id,in,out\n")
+        for (identifier, in_time, out_time) in run_query(db_file, SELECT_ALL):
+            f.write(f"{identifier},{in_time},{out_time}\n")
+
+
+def export(db_file, export_format: str, export_out: str):
+    if not export_out:
+        print("Specify where to export to using --export-out FILENAME.")
+        return
+
+    if export_format.lower() == "csv":
+        _export_csv(db_file, export_out)
 
 
 def archive(database, archive_dir):
@@ -137,6 +149,7 @@ def create_parser():
     parser.add_argument("--archive-dir", help="Directory to store archived databases.", default="./archive/")
     parser.add_argument("--export-format", help="Format to export database in.", nargs="?", choices=["CSV", "PDF"],
                         default="CSV")
+    parser.add_argument("--export-out", help="Path to export to.")
 
     return parser
 
@@ -166,7 +179,7 @@ if __name__ == '__main__':
     elif args.action == "delete":
         delete_entry(args.database, args.identifier)
     elif args.action == "export":
-        export(args.database, args.export_format)
+        export(args.database, args.export_format, args.export_out)
     elif args.action == "archive":
         archive(args.database, args.archive_dir)
     elif args.action == "reset":
