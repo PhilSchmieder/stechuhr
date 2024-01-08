@@ -171,7 +171,7 @@ def delete_entry(db_file, identifier):
 
 
 def create_parser():
-    parser = argparse.ArgumentParser(prog='Stechuhr', description='Keep time on your working hours')
+    parser = argparse.ArgumentParser(prog='Stechuhr', description='Keep time of your working hours')
 
     parser.add_argument("action",
                         choices=["new", "in", "out", "print", "update", "delete", "export", "archive", "reset",
