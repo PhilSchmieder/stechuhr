@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><title>HTML Export</title></head>
+<body>
+<table>
+    <tr>
+        <th>ID</th>
+        <th>IN</th>
+        <th>OUT</th>
+    </tr>
+    {% for entry in entries %}
+        <tr>
+            <td>{{ entry.id }}</td>
+            <td>{{ entry.in_time }}</td>
+            <td>{{ entry.out_time }}</td>
+        </tr>
+    {% endfor %}
+</table>
+</body>
+</html>

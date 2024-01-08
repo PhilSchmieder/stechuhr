@@ -2,3 +2,5 @@
 *.db
 archive
 .token
+templates/*.jinja
+!templates/default.jinja

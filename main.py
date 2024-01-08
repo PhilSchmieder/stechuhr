@@ -4,7 +4,8 @@ import shutil
 import sqlite3
 from os import remove, mkdir
 from os.path import exists, join
-from sys import stdout
+import jinja2
+from jinja2 import FileSystemLoader
 
 SELECT_ALL = ("SELECT * FROM time")
 SELECT_ALL_ORDERED_TIMEWISE = ("SELECT * FROM time ORDER BY begin")
@@ -95,7 +96,7 @@ def new_db(db_file):
     run_query(db_file, CREATE_TABLE_TIME)
 
 
-def _build_csv(db_file, export_out) -> str:
+def _build_csv(db_file) -> str:
     s = "id,in,out\n"
     for (identifier, in_time, out_time) in run_query(db_file, SELECT_ALL):
         s += f"{identifier},{in_time},{out_time}\n"
@@ -103,11 +104,38 @@ def _build_csv(db_file, export_out) -> str:
     return s
 
 
-def export(db_file, export_format: str, export_out: str):
+def _render_jinja_template(template_path: str, data: dict) -> str:
+    env = jinja2.Environment(loader=FileSystemLoader("."))
+    template = env.get_template(template_path)
+    return template.render(data)
+
+
+def _build_html(db_file, template_path):
+    entries = run_query(db_file, SELECT_ALL)
+
+    template_data = {
+        "entries": [
+            {
+                "id": identifier,
+                "in_time": datetime.datetime.strptime(in_time, "%Y-%m-%d %H:%M:%S") if in_time else None,
+                "out_time": datetime.datetime.strptime(out_time, "%Y-%m-%d %H:%M:%S") if out_time else None
+            }
+            for (identifier, in_time, out_time) in entries]
+    }
+
+    html = _render_jinja_template(template_path, template_data)
+
+    return html
+
+
+def export(db_file, export_format: str, export_out: str, template_path: str):
     export_data = None
 
     if export_format.lower() == "csv":
-        export_data = _build_csv(db_file, export_out)
+        export_data = _build_csv(db_file)
+
+    elif export_format.lower() == "html":
+        export_data = _build_html(db_file, template_path)
 
     if export_out:
         with open(export_out, "w") as f:
@@ -154,9 +182,11 @@ def create_parser():
     parser.add_argument("--database", help="Specify database file.", default="stechuhr.db")
     parser.add_argument("--to-merge", help="Path to database to merge.")
     parser.add_argument("--archive-dir", help="Directory to store archived databases.", default="./archive/")
-    parser.add_argument("--export-format", help="Format to export database in.", nargs="?", choices=["CSV", "PDF"],
+    parser.add_argument("--export-format", help="Format to export database in.", nargs="?", choices=["CSV", "HTML"],
                         default="CSV")
     parser.add_argument("--export-file", help="Path to export to.")
+    parser.add_argument("--template-path", help="Path Jinja template for HTML export.",
+                        default="./templates/default.jinja")
 
     return parser
 
@@ -199,7 +229,7 @@ if __name__ == '__main__':
     elif args.action == "delete":
         delete_entry(args.database, args.identifier)
     elif args.action == "export":
-        export(args.database, args.export_format, args.export_file)
+        export(args.database, args.export_format, args.export_file, args.template_path)
     elif args.action == "archive":
         archive(args.database, args.archive_dir)
     elif args.action == "reset":
