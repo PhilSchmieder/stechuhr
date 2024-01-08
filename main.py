@@ -6,6 +6,7 @@ from os import remove, mkdir
 from os.path import exists, join
 
 SELECT_ALL = ("SELECT * FROM time")
+SELECT_ALL_ORDERED_TIMEWISE = ("SELECT * FROM time ORDER BY begin")
 GET_LATEST_ENTRY = "SELECT * FROM time ORDER BY id DESC LIMIT 1"
 GET_ENTRY_BY_ID = "SELECT * FROM time WHERE id = ?"
 INSERT_CLOCK_IN = "INSERT INTO time(begin) VALUES(?)"
@@ -140,7 +141,7 @@ def create_parser():
 
     parser.add_argument("action",
                         choices=["new", "in", "out", "print", "update", "delete", "export", "archive", "reset",
-                                 "merge"], nargs="?", default="print")
+                                 "merge", "sort"], nargs="?", default="print")
     parser.add_argument("--in-time", help="Clock in with given time. Format: YYYY-MM-DD HH:mm:ss")
     parser.add_argument("--out-time", help="Clock out with given time. Format: YYYY-MM-DD HH:mm:ss")
     parser.add_argument("--identifier", help="ID of the entry you want to update/delete.", type=int)
@@ -155,8 +156,19 @@ def create_parser():
 
 
 def merge(db_file, to_merge):
-
     for (_, in_time, out_time) in run_query(to_merge, SELECT_ALL):
+        if in_time:
+            clock_in(db_file, in_time)
+
+        if out_time:
+            clock_out(db_file, out_time)
+
+
+def sort(db_file):
+    ordered_entries = run_query(db_file, SELECT_ALL_ORDERED_TIMEWISE)
+    run_query(db_file, DELETE_ALL)
+
+    for (_, in_time, out_time) in ordered_entries:
         if in_time:
             clock_in(db_file, in_time)
 
@@ -188,3 +200,5 @@ if __name__ == '__main__':
         reset(args.database)
     elif args.action == "merge":
         merge(args.database, args.to_merge)
+    elif args.action == "sort":
+        sort(args.database)
