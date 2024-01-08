@@ -1,9 +1,9 @@
-import datetime
-import sqlite3
 import argparse
-from os.path import exists, join
-from os import remove, mkdir
+import datetime
 import shutil
+import sqlite3
+from os import remove, mkdir
+from os.path import exists, join
 
 SELECT_ALL = ("SELECT * FROM time")
 GET_LATEST_ENTRY = "SELECT * FROM time ORDER BY id DESC LIMIT 1"
@@ -33,42 +33,34 @@ def run_query(db_file, query, obj=None):
         return cur.fetchall()
 
 
-def clock_in(db_file, time=datetime.datetime.now()):
-    time = time if time else datetime.datetime.now()
+def clock_in(db_file, time: str):
+    time = time if time else datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
-    t = (
-        time.strftime("%Y-%m-%d %H:%M:%S"),  # '2007-01-01 10:00:00'
-    )
-    return run_query(db_file, INSERT_CLOCK_IN, t)
+    return run_query(db_file, INSERT_CLOCK_IN, (time,))
 
 
-def clock_out(db_file, time=datetime.datetime.now()):
-    time = time if time else datetime.datetime.now()
+def clock_out(db_file, time: str):
+    time = time if time else datetime.datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     (identifier, in_time, out_time) = run_query(db_file, GET_LATEST_ENTRY)[0]
 
     if out_time:
         print("WARNING: The latest entry already has a clock out time.")
+        print("Did you forget to clock in?.")
         print("A new entry will be created with only a clock out time.")
 
-        t = (
-            time.strftime("%Y-%m-%d %H:%M:%S"),  # '2007-01-01 10:00:00'
-        )
-
-        return run_query(db_file, INSERT_CLOCK_OUT, t)
+        return run_query(db_file, INSERT_CLOCK_OUT, (time,))
 
     t = (
         in_time,
-        time.strftime("%Y-%m-%d %H:%M:%S"),  # '2007-01-01 10:00:00'
+        time,
         identifier
     )
     return run_query(db_file, UPDATE_CLOCK_IN_OUT, t)
 
 
 def print_db(db_file):
-    pprint(
-        run_query(db_file, SELECT_ALL)
-    )
+    pprint(run_query(db_file, SELECT_ALL))
 
 
 def pprint(lines: list[(int, datetime, datetime)]) -> None:
@@ -135,17 +127,25 @@ def reset(db_file, no_interact: bool = False):
         run_query(db_file, DELETE_ALL)
 
 
-def create_parser():
-    parser = argparse.ArgumentParser(
-        prog='Stechuhr',
-        description='Keep time on your working hours')
+def delete_entry(db_file, identifier):
+    if not identifier:
+        print("Specify which entry to delete using --identifier ID.")
+        return
 
-    parser.add_argument("action", choices=["new", "in", "out", "print", "update", "delete", "export", "archive", "reset"],
-                        nargs="?", default="print")
+    run_query(db_file, DELETE_BY_ID, (identifier,))
+
+
+def create_parser():
+    parser = argparse.ArgumentParser(prog='Stechuhr', description='Keep time on your working hours')
+
+    parser.add_argument("action",
+                        choices=["new", "in", "out", "print", "update", "delete", "export", "archive", "reset",
+                                 "merge"], nargs="?", default="print")
     parser.add_argument("--in-time", help="Clock in with given time. Format: YYYY-MM-DD HH:mm:ss")
     parser.add_argument("--out-time", help="Clock out with given time. Format: YYYY-MM-DD HH:mm:ss")
     parser.add_argument("--identifier", help="ID of the entry you want to update/delete.", type=int)
     parser.add_argument("--database", help="Specify database file.", default="stechuhr.db")
+    parser.add_argument("--to-merge", help="Path to database to merge.")
     parser.add_argument("--archive-dir", help="Directory to store archived databases.", default="./archive/")
     parser.add_argument("--export-format", help="Format to export database in.", nargs="?", choices=["CSV", "PDF"],
                         default="CSV")
@@ -154,12 +154,14 @@ def create_parser():
     return parser
 
 
-def delete_entry(db_file, identifier):
-    if not identifier:
-        print("Specify which entry to delete using --identifier ID.")
-        return
+def merge(db_file, to_merge):
 
-    run_query(db_file, DELETE_BY_ID, (identifier,))
+    for (_, in_time, out_time) in run_query(to_merge, SELECT_ALL):
+        if in_time:
+            clock_in(db_file, in_time)
+
+        if out_time:
+            clock_out(db_file, out_time)
 
 
 if __name__ == '__main__':
@@ -184,3 +186,5 @@ if __name__ == '__main__':
         archive(args.database, args.archive_dir)
     elif args.action == "reset":
         reset(args.database)
+    elif args.action == "merge":
+        merge(args.database, args.to_merge)
