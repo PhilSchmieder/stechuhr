@@ -6,7 +6,7 @@ Stechuhr is a CLI tool to keep time of your working hours.
 
 ## Usage
 ```shell
-Usage: cli [OPTIONS] COMMAND [ARGS]...
+Usage: stechuhr [OPTIONS] COMMAND [ARGS]...
 
 Options:
   --help  Show this message and exit.
