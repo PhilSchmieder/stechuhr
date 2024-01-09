@@ -5,121 +5,127 @@ Stechuhr is a CLI tool to keep time of your working hours.
 
 
 ## Usage
-**Create New**  
-To create a new stechuhr database, run
-
 ```shell
-stechuhr new
-``` 
+Usage: cli [OPTIONS] COMMAND [ARGS]...
 
-This will create a new stechuhr database and store it as the default database.
-You may change this using the `--database PATH/TO/STECHUHR/DATABASE` argument.
+Options:
+  --help  Show this message and exit.
 
-**Clock in**  
-To clock in to a stechuhr, run
+Commands:
+  archive   Archive Stechuhr.
+  delete    Delete Stechuhr entry.
+  dumphelp
+  export    Export data.
+  in        Clock in.
+  merge     Merge Stechuhr with Stechuhr TO_MERGE.
+  new       Create new Stechuhr.
+  out       Clock out.
+  print     Print Stechuhr data.
+  reset     Reset Stechuhr.
+  sort      Sort Stechuhr entries by clock in time.
+  update    Update entry with id IDENTIFIER.
 
-```shell
-stechuhr in
+Usage: cli in [OPTIONS]
+
+  Clock in.
+
+Options:
+  -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
+  -t, --time TEXT      Clock in with given time. Format: YYYY-MM-DD HH:mm:ss.
+                       Defaults to now.
+  --help               Show this message and exit.
+
+Usage: cli out [OPTIONS]
+
+  Clock out.
+
+Options:
+  -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
+  -t, --time TEXT      Clock out with given time. Format: YYYY-MM-DD HH:mm:ss.
+                       Defaults to now.
+  --help               Show this message and exit.
+
+Usage: cli print [OPTIONS]
+
+  Print Stechuhr data.
+
+Options:
+  -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
+  --help               Show this message and exit.
+
+Usage: cli update [OPTIONS] IDENTIFIER
+
+  Update entry with id IDENTIFIER.
+
+Options:
+  -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
+  -i, --in-time TEXT   Clock in with given time. Format: YYYY-MM-DD HH:mm:ss
+  -o, --out-time TEXT  Clock out with given time. Format: YYYY-MM-DD HH:mm:ss
+  --help               Show this message and exit.
+
+Usage: cli new [OPTIONS]
+
+  Create new Stechuhr.
+
+Options:
+  -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
+  --help               Show this message and exit.
+
+Usage: cli export [OPTIONS]
+
+  Export data.
+
+Options:
+  -d, --database TEXT      Database file. Defaults to 'stechuhr.db'.
+  -f, --format [CSV|HTML]  Export format.
+  -o, --out TEXT           Output path. Defaults to stdout.
+  -t, --template TEXT      Path to jinja template for html export. Defaults to
+                           './templates/default.jinja'
+  --help                   Show this message and exit.
+
+Usage: cli archive [OPTIONS]
+
+  Archive Stechuhr.
+
+Options:
+  -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
+  --archive-dir TEXT   Path to archive directory. Defaults to './archive/'
+  --help               Show this message and exit.
+
+Usage: cli reset [OPTIONS]
+
+  Reset Stechuhr.
+
+Options:
+  -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
+  --help               Show this message and exit.
+
+Usage: cli delete [OPTIONS] IDENTIFIER
+
+  Delete Stechuhr entry.
+
+Options:
+  -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
+  --help               Show this message and exit.
+
+Usage: cli merge [OPTIONS] TO_MERGE
+
+  Merge Stechuhr with Stechuhr TO_MERGE.
+
+Options:
+  -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
+  --help               Show this message and exit.
+
+Usage: cli sort [OPTIONS]
+
+  Sort Stechuhr entries by clock in time.
+
+Options:
+  -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
+  --help               Show this message and exit.
+
+Usage: cli dumphelp [OPTIONS]
+
+Options:
+  --help  Show this message and exit.
 ```
-
-This will clock in to the default stechuhr.
-You may change which stechuhr is used with the `--database PATH/TO/STECHUHR/DATABASE` argument.
-
-By default, you will be clocked in at the current time.
-You may change this with the `--in-time 'YYYY-MM-DD HH:mm:ss'` argument.
-
-**Clock out**  
-To clock out off a stechuhr, run
-
-```shell
-stechuhr out
-```  
-
-This will clock out of the default stechuhr.
-You may change which stechuhr is used with the `--database PATH/TO/STECHUHR/DATABASE` argument.
-
-By default, you will be clocked out at the current time.
-You may change this with the `--out-time 'YYYY-MM-DD HH:mm:ss'` argument.
-
-**Print**  
-To create a stechuhr database, run `stechuhr print`, or simply `stechuhr`.
-This will print the default stechuhr.
-You may change which stechuhr is used with the `--database PATH/TO/STECHUHR/DATABASE` argument.
-
-**Update Entry**  
-To update an entry in a stechuhr, run
-
-```shell
-stechuhr update --identifier ID --in-time 'YYYY-MM-DD HH:mm:ss' --out-time 'YYYY-MM-DD HH:mm:ss'
-``` 
-
-This will update the entry `ID` with the given times in the default stechuhr.
-You may omit the `--in-time` or `--out-time` argument, if you only want to update one.
-You may change which stechuhr is used with the `--database PATH/TO/STECHUHR/DATABASE` argument.
-
-**Delete Entry**  
-To delete an entry in a stechuhr, run
-
-```shell
-stechuhr update --identifier ID
-```
-
-This will delete the entry `ID` in the default stechuhr.
-You may change which stechuhr is used with the `--database PATH/TO/STECHUHR/DATABASE` argument.
-
-**Export**  
-To export a stechuhr, run
-
-```shell
-stechuhr export
-```  
-
-This will export the default stechuhr in a CSV format.
-You may change the format with the `--export-format FORMAT` argument.
-When exporting to HTML a default jinja template is used.
-You may change the template with the `--template-path TEMPLATE` argument.
-By default, the output gets written to stdout.
-You may change this with the `--export-file FILENAME` argument.
-You may change which stechuhr is used with the `--database PATH/TO/STECHUHR/DATABASE` argument.
-
-**Archive**  
-To archive a stechuhr, run
-
-```shell
-stechuhr archive
-```  
-
-This will archive the default stechuhr to `./archive/<CURRENT_DATETIME>_<STECHUHR_DB_NAME>.db`.
-You may change the archive directory using the `--archive-dir DIR` argument.
-You may change which stechuhr is used with the `--database PATH/TO/STECHUHR/DATABASE` argument.
-
-**Reset**  
-To reset a stechuhr, run
-
-```shell
-stechuhr reset
-```  
-
-This will reset the default stechuhr.
-You may change which stechuhr is used with the `--database PATH/TO/STECHUHR/DATABASE` argument.
-
-**Merge two**
-To merge a stechuhr with another one, run
-
-```shell
-stechuhr merge --to-merge PATH/TO/OTHER/STECHUHR
-```   
-
-This will reset the stechuhr given by the `--to-merge PATH/TO/OTHER/STECHUHR` argument into the default stechuhr.
-You may change which stechuhr is used with the `--database PATH/TO/STECHUHR/DATABASE` argument.
-
-**Sort**  
-To sort a stechuhr, run
-
-```shell
-stechuhr sort
-```
-
-This will sort the default stechuhr according to the clock in times.
-This will change the ID's in the underlying database.
-You may change which stechuhr is used with the `--database PATH/TO/STECHUHR/DATABASE` argument.
