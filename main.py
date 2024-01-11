@@ -233,6 +233,59 @@ def sort(database):
             clock_out(database, out_time)
 
 
+def _get_week_bounds(time: datetime.datetime):
+    start_of_week = time - datetime.timedelta(days=time.weekday())
+    start_of_week = start_of_week.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_of_week = start_of_week + datetime.timedelta(days=7) - datetime.timedelta(microseconds=1)
+
+    return start_of_week, end_of_week
+
+
+def _get_month_bounds(time: datetime.datetime):
+    start_of_month = time.replace(day=1, hour=0, minute=0, second=0, microsecond=0)
+    end_of_month = (start_of_month.replace(day=1) + datetime.timedelta(days=32)).replace(day=1) - datetime.timedelta(
+        days=1)
+    end_of_month = end_of_month + datetime.timedelta(days=1) - datetime.timedelta(microseconds=1)
+
+    return start_of_month, end_of_month
+
+
+@cli.command(name="hours", help="Print amount of hours.")
+@click.option("-d", "--database", help="Database file. Defaults to 'stechuhr.db'.", default="stechuhr.db")
+@click.option("-t", "--time", help="Reference time. Format: YYYY-MM-DD HH:mm:ss. Defaults to now.")
+def hours(database, time: str):
+    time = datetime.datetime.strptime(time, "%Y-%m-%d %H:%M:%S") if time else datetime.datetime.now()
+    entries = run_query(database, SELECT_ALL)
+
+    start_week, end_week = _get_week_bounds(time)
+    start_month, end_month = _get_month_bounds(time)
+
+    hours_overall = 0
+    hours_month = 0
+    hours_week = 0
+
+    for (_, in_time, out_time) in entries:
+        if in_time and out_time:
+            in_time = datetime.datetime.strptime(in_time, "%Y-%m-%d %H:%M:%S")
+            out_time = datetime.datetime.strptime(out_time, "%Y-%m-%d %H:%M:%S")
+
+            hours_between = (out_time - in_time).total_seconds() / 3600
+
+            hours_overall += hours_between
+
+            if in_time > start_month and out_time < end_month:
+                hours_month += hours_between
+
+            if in_time > start_week and out_time < end_week:
+                hours_week += hours_between
+
+    click.echo(
+        f"Overall: {hours_overall:.2f} hours\n"
+        f"Month: {hours_month:.2f} hours\n"
+        f"Week: {hours_week:.2f} hours"
+    )
+
+
 def recursive_help(cmd, parent=None):
     ctx = click.core.Context(cmd, info_name=cmd.name, parent=parent)
     print(cmd.get_help(ctx))

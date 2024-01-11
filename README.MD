@@ -8,22 +8,24 @@ Stechuhr is a CLI tool to keep time of your working hours.
 ```shell
 Usage: stechuhr [OPTIONS] COMMAND [ARGS]...
 
+  Stechuhr is a CLI tool to keep time of your working hours.
+
 Options:
   --help  Show this message and exit.
 
 Commands:
-  archive   Archive Stechuhr.
-  delete    Delete Stechuhr entry.
-  dumphelp
-  export    Export data.
-  in        Clock in.
-  merge     Merge Stechuhr with Stechuhr TO_MERGE.
-  new       Create new Stechuhr.
-  out       Clock out.
-  print     Print Stechuhr data.
-  reset     Reset Stechuhr.
-  sort      Sort Stechuhr entries by clock in time.
-  update    Update entry with id IDENTIFIER.
+  archive  Archive Stechuhr.
+  delete   Delete Stechuhr entry.
+  export   Export data.
+  hours    Print amount of hours.
+  in       Clock in.
+  merge    Merge Stechuhr with Stechuhr TO_MERGE.
+  new      Create new Stechuhr.
+  out      Clock out.
+  print    Print Stechuhr data.
+  reset    Reset Stechuhr.
+  sort     Sort Stechuhr entries by clock in time.
+  update   Update entry with id IDENTIFIER.
 
 Usage: cli in [OPTIONS]
 
@@ -122,6 +124,16 @@ Usage: cli sort [OPTIONS]
 
 Options:
   -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
+  --help               Show this message and exit.
+
+Usage: cli hours [OPTIONS]
+
+  Print amount of hours.
+
+Options:
+  -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
+  -t, --time TEXT      Reference time. Format: YYYY-MM-DD HH:mm:ss. Defaults
+                       to now.
   --help               Show this message and exit.
 
 Usage: cli dumphelp [OPTIONS]
