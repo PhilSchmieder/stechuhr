@@ -27,7 +27,7 @@ Commands:
   sort     Sort Stechuhr entries by clock in time.
   update   Update entry with id IDENTIFIER.
 
-Usage: cli in [OPTIONS]
+Usage: stechuhr in [OPTIONS]
 
   Clock in.
 
@@ -37,7 +37,7 @@ Options:
                        Defaults to now.
   --help               Show this message and exit.
 
-Usage: cli out [OPTIONS]
+Usage: stechuhr out [OPTIONS]
 
   Clock out.
 
@@ -47,7 +47,7 @@ Options:
                        Defaults to now.
   --help               Show this message and exit.
 
-Usage: cli print [OPTIONS]
+Usage: stechuhr print [OPTIONS]
 
   Print Stechuhr data.
 
@@ -55,7 +55,7 @@ Options:
   -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
   --help               Show this message and exit.
 
-Usage: cli update [OPTIONS] IDENTIFIER
+Usage: stechuhr update [OPTIONS] IDENTIFIER
 
   Update entry with id IDENTIFIER.
 
@@ -65,7 +65,7 @@ Options:
   -o, --out-time TEXT  Clock out with given time. Format: YYYY-MM-DD HH:mm:ss
   --help               Show this message and exit.
 
-Usage: cli new [OPTIONS]
+Usage: stechuhr new [OPTIONS]
 
   Create new Stechuhr.
 
@@ -73,7 +73,7 @@ Options:
   -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
   --help               Show this message and exit.
 
-Usage: cli export [OPTIONS]
+Usage: stechuhr export [OPTIONS]
 
   Export data.
 
@@ -85,7 +85,7 @@ Options:
                            './templates/default.jinja'
   --help                   Show this message and exit.
 
-Usage: cli archive [OPTIONS]
+Usage: stechuhr archive [OPTIONS]
 
   Archive Stechuhr.
 
@@ -94,7 +94,7 @@ Options:
   --archive-dir TEXT   Path to archive directory. Defaults to './archive/'
   --help               Show this message and exit.
 
-Usage: cli reset [OPTIONS]
+Usage: stechuhr reset [OPTIONS]
 
   Reset Stechuhr.
 
@@ -102,7 +102,7 @@ Options:
   -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
   --help               Show this message and exit.
 
-Usage: cli delete [OPTIONS] IDENTIFIER
+Usage: stechuhr delete [OPTIONS] IDENTIFIER
 
   Delete Stechuhr entry.
 
@@ -110,7 +110,7 @@ Options:
   -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
   --help               Show this message and exit.
 
-Usage: cli merge [OPTIONS] TO_MERGE
+Usage: stechuhr merge [OPTIONS] TO_MERGE
 
   Merge Stechuhr with Stechuhr TO_MERGE.
 
@@ -118,7 +118,7 @@ Options:
   -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
   --help               Show this message and exit.
 
-Usage: cli sort [OPTIONS]
+Usage: stechuhr sort [OPTIONS]
 
   Sort Stechuhr entries by clock in time.
 
@@ -126,7 +126,7 @@ Options:
   -d, --database TEXT  Database file. Defaults to 'stechuhr.db'.
   --help               Show this message and exit.
 
-Usage: cli hours [OPTIONS]
+Usage: stechuhr hours [OPTIONS]
 
   Print amount of hours.
 
@@ -136,8 +136,9 @@ Options:
                        to now.
   --help               Show this message and exit.
 
-Usage: cli dumphelp [OPTIONS]
+Usage: stechuhr dumphelp [OPTIONS]
 
 Options:
   --help  Show this message and exit.
+
 ```

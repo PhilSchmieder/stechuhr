@@ -38,11 +38,11 @@ def run_query(database, query, obj=None):
 
 
 @click.group(help="Stechuhr is a CLI tool to keep time of your working hours.")
-def cli():
+def stechuhr():
     pass
 
 
-@cli.command(name="in", help="Clock in.")
+@stechuhr.command(name="in", help="Clock in.")
 @click.option("-d", "--database", help="Database file. Defaults to 'stechuhr.db'.", default="stechuhr.db")
 @click.option("-t", "--time", help="Clock in with given time. Format: YYYY-MM-DD HH:mm:ss. Defaults to now.")
 def clock_in(database, time: str):
@@ -51,7 +51,7 @@ def clock_in(database, time: str):
     return run_query(database, INSERT_CLOCK_IN, (time,))
 
 
-@cli.command(name="out", help="Clock out.")
+@stechuhr.command(name="out", help="Clock out.")
 @click.option("-d", "--database", help="Database file. Defaults to 'stechuhr.db'.", default="stechuhr.db")
 @click.option("-t", "--time", help="Clock out with given time. Format: YYYY-MM-DD HH:mm:ss. Defaults to now.")
 def clock_out(database, time: str):
@@ -74,7 +74,7 @@ def clock_out(database, time: str):
     return run_query(database, UPDATE_CLOCK_IN_OUT, t)
 
 
-@cli.command(name="print", help="Print Stechuhr data.")
+@stechuhr.command(name="print", help="Print Stechuhr data.")
 @click.option("-d", "--database", help="Database file. Defaults to 'stechuhr.db'.", default="stechuhr.db")
 def print_db(database):
     pprint(run_query(database, SELECT_ALL))
@@ -86,7 +86,7 @@ def pprint(lines: list[(int, datetime, datetime)]) -> None:
         click.echo(f"{identifier}\t{in_time}\t{out_time}")
 
 
-@cli.command(name="update", help="Update entry with id IDENTIFIER.")
+@stechuhr.command(name="update", help="Update entry with id IDENTIFIER.")
 @click.argument("identifier", type=int, required=True)
 @click.option("-d", "--database", help="Database file. Defaults to 'stechuhr.db'.", default="stechuhr.db")
 @click.option("-i", "--in-time", help="Clock in with given time. Format: YYYY-MM-DD HH:mm:ss")
@@ -103,7 +103,7 @@ def update_entry(database, identifier, in_time, out_time):
         run_query(database, UPDATE_CLOCK_OUT, (out_time, identifier))
 
 
-@cli.command(name="new", help="Create new Stechuhr.")
+@stechuhr.command(name="new", help="Create new Stechuhr.")
 @click.option("-d", "--database", help="Database file. Defaults to 'stechuhr.db'.", default="stechuhr.db")
 def new_db(database):
     if exists(database):
@@ -149,7 +149,7 @@ def _build_html(database, template_path):
     return html
 
 
-@cli.command(name="export", help="Export data.")
+@stechuhr.command(name="export", help="Export data.")
 @click.option("-d", "--database", help="Database file. Defaults to 'stechuhr.db'.", default="stechuhr.db")
 @click.option("-f", "--format", "export_format", help="Export format.", default="csv",
               type=click.Choice(['CSV', 'HTML'], case_sensitive=False))
@@ -173,7 +173,7 @@ def export(database, export_format: str, out: str, template: str):
         click.echo(export_data)
 
 
-@cli.command(name="archive", help="Archive Stechuhr.")
+@stechuhr.command(name="archive", help="Archive Stechuhr.")
 @click.option("-d", "--database", help="Database file. Defaults to 'stechuhr.db'.", default="stechuhr.db")
 @click.option("--archive-dir", help="Path to archive directory. Defaults to './archive/'", default="./archive/")
 def archive(database, archive_dir):
@@ -186,7 +186,7 @@ def archive(database, archive_dir):
     shutil.copy(database, str(join(archive_dir, timestamp + "_" + file)))
 
 
-@cli.command(name="reset", help="Reset Stechuhr.")
+@stechuhr.command(name="reset", help="Reset Stechuhr.")
 @click.option("-d", "--database", help="Database file. Defaults to 'stechuhr.db'.", default="stechuhr.db")
 def reset(database, no_interact: bool = False):
     if no_interact:
@@ -198,7 +198,7 @@ def reset(database, no_interact: bool = False):
         run_query(database, DELETE_ALL)
 
 
-@cli.command(name="delete", help="Delete Stechuhr entry.")
+@stechuhr.command(name="delete", help="Delete Stechuhr entry.")
 @click.argument("identifier", type=int, required=True)
 @click.option("-d", "--database", help="Database file. Defaults to 'stechuhr.db'.", default="stechuhr.db")
 def delete_entry(database, identifier):
@@ -209,7 +209,7 @@ def delete_entry(database, identifier):
     run_query(database, DELETE_BY_ID, (identifier,))
 
 
-@cli.command(name="merge", help="Merge Stechuhr with Stechuhr TO_MERGE.")
+@stechuhr.command(name="merge", help="Merge Stechuhr with Stechuhr TO_MERGE.")
 @click.argument("TO_MERGE", type=str, required=True)
 @click.option("-d", "--database", help="Database file. Defaults to 'stechuhr.db'.", default="stechuhr.db")
 def merge(database, to_merge):
@@ -221,7 +221,7 @@ def merge(database, to_merge):
             clock_out(database, out_time)
 
 
-@cli.command(name="sort", help="Sort Stechuhr entries by clock in time.")
+@stechuhr.command(name="sort", help="Sort Stechuhr entries by clock in time.")
 @click.option("-d", "--database", help="Database file. Defaults to 'stechuhr.db'.", default="stechuhr.db")
 def sort(database):
     ordered_entries = run_query(database, SELECT_ALL_ORDERED_TIMEWISE)
@@ -252,7 +252,7 @@ def _get_month_bounds(time: datetime.datetime):
     return start_of_month, end_of_month
 
 
-@cli.command(name="hours", help="Print amount of hours.")
+@stechuhr.command(name="hours", help="Print amount of hours.")
 @click.option("-d", "--database", help="Database file. Defaults to 'stechuhr.db'.", default="stechuhr.db")
 @click.option("-t", "--time", help="Reference time. Format: YYYY-MM-DD HH:mm:ss. Defaults to now.")
 def hours(database, time: str):
@@ -297,10 +297,10 @@ def recursive_help(cmd, parent=None):
         recursive_help(sub, ctx)
 
 
-@cli.command(hidden=True)
+@stechuhr.command(hidden=True)
 def dumphelp():
-    recursive_help(cli)
+    recursive_help(stechuhr)
 
 
 if __name__ == '__main__':
-    cli()
+    stechuhr()
