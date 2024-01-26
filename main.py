@@ -2,7 +2,7 @@ import datetime
 import shutil
 import sqlite3
 from os import remove, mkdir
-from os.path import exists, join
+from os.path import exists, join, split
 
 import click
 import jinja2
@@ -180,8 +180,10 @@ def archive(database, archive_dir):
     if not exists(archive_dir):
         mkdir(archive_dir)
 
+    _, file = split(database)
+
     timestamp = datetime.datetime.now().isoformat().replace(" ", "_")
-    shutil.copy(database, str(join(archive_dir, timestamp + "_" + database)))
+    shutil.copy(database, str(join(archive_dir, timestamp + "_" + file)))
 
 
 @cli.command(name="reset", help="Reset Stechuhr.")
