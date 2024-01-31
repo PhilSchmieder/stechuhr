@@ -214,11 +214,16 @@ def delete_entry(database, identifier):
 @click.option("-d", "--database", help="Database file. Defaults to 'stechuhr.db'.", default="stechuhr.db")
 def merge(database, to_merge):
     for (_, in_time, out_time) in run_query(to_merge, SELECT_ALL):
+        if in_time and out_time:
+            run_query(database, INSERT_CLOCK_IN_OUT, (in_time, out_time))
+            continue
+
         if in_time:
-            clock_in(database, in_time)
+            run_query(database, INSERT_CLOCK_IN, (in_time,))
+            continue
 
         if out_time:
-            clock_out(database, out_time)
+            run_query(database, INSERT_CLOCK_OUT, (out_time,))
 
 
 @stechuhr.command(name="sort", help="Sort Stechuhr entries by clock in time.")
@@ -228,11 +233,16 @@ def sort(database):
     run_query(database, DELETE_ALL)
 
     for (_, in_time, out_time) in ordered_entries:
+        if in_time and out_time:
+            run_query(database, INSERT_CLOCK_IN_OUT, (in_time, out_time))
+            continue
+
         if in_time:
-            clock_in(database, in_time)
+            run_query(database, INSERT_CLOCK_IN, (in_time,))
+            continue
 
         if out_time:
-            clock_out(database, out_time)
+            run_query(database, INSERT_CLOCK_OUT, (out_time,))
 
 
 def _get_week_bounds(time: datetime.datetime):
